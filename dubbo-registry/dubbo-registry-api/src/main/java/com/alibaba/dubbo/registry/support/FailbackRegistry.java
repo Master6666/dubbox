@@ -435,6 +435,7 @@ public abstract class FailbackRegistry extends AbstractRegistry {
     public void destroy() {
         super.destroy();
         try {
+            retryExecutor.shutdown();
             retryFuture.cancel(true);
         } catch (Throwable t) {
             logger.warn(t.getMessage(), t);
