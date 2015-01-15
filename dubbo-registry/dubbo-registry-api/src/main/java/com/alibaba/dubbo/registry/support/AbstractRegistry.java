@@ -94,7 +94,8 @@ public abstract class AbstractRegistry implements Registry {
         String filename = url.getParameter(Constants.FILE_KEY, System.getProperty("user.home") + "/.dubbo/dubbo-registry-" + url.getHost() + ".cache");
         String appName = url.getParameter(Constants.APPLICATION_KEY);
         if(appName != null && !(appName.trim().equals(""))){
-        	filename = filename.replace("dubbo-registry-", appName);
+        	String keyReplace = "dubbo-registry-";
+        	filename = filename.replace(keyReplace, keyReplace+appName);
         }
         File file = null;
         if (ConfigUtils.isNotEmpty(filename)) {
