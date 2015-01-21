@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.ExecutorManager;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import com.alibaba.dubbo.common.logger.Logger;
@@ -44,6 +45,7 @@ public class WrappedChannelHandler implements ChannelHandlerDelegate {
     protected final URL url;
     
     public WrappedChannelHandler(ChannelHandler handler, URL url) {
+    	ExecutorManager.put(this.getClass().getName(),SHARED_EXECUTOR);
         this.handler = handler;
         this.url = url;
         executor = (ExecutorService) ExtensionLoader.getExtensionLoader(ThreadPool.class).getAdaptiveExtension().getExecutor(url);

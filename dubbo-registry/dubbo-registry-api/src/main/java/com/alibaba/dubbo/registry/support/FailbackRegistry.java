@@ -29,6 +29,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.ExecutorManager;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.alibaba.dubbo.common.utils.NamedThreadFactory;
@@ -58,7 +59,8 @@ public abstract class FailbackRegistry extends AbstractRegistry {
     private final ConcurrentMap<URL, Map<NotifyListener, List<URL>>> failedNotified = new ConcurrentHashMap<URL, Map<NotifyListener, List<URL>>>();
 
     public FailbackRegistry(URL url) {
-        super(url);
+    	super(url);
+    	ExecutorManager.put(retryExecutor.toString(), retryExecutor);
         int retryPeriod = url.getParameter(Constants.REGISTRY_RETRY_PERIOD_KEY, Constants.DEFAULT_REGISTRY_RETRY_PERIOD);
         this.retryFuture = retryExecutor.scheduleWithFixedDelay(new Runnable() {
             public void run() {

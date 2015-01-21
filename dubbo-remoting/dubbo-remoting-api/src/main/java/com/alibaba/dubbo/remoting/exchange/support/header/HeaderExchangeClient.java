@@ -23,6 +23,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.ExecutorManager;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
@@ -61,6 +62,7 @@ public class HeaderExchangeClient implements ExchangeClient {
     private final ExchangeChannel channel;
 
     public HeaderExchangeClient(Client client){
+        ExecutorManager.put(this.getClass().getName(), scheduled);
         if (client == null) {
             throw new IllegalArgumentException("client == null");
         }

@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.ExecutorManager;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
@@ -89,13 +90,14 @@ public abstract class AbstractRegistry implements Registry {
 
     public AbstractRegistry(URL url) {
         setUrl(url);
+    	ExecutorManager.put(registryCacheExecutor.toString(), registryCacheExecutor);
         // 启动文件保存定时器
         syncSaveFile = url.getParameter(Constants.REGISTRY_FILESAVE_SYNC_KEY, false);
         String filename = url.getParameter(Constants.FILE_KEY, System.getProperty("user.home") + "/.dubbo/dubbo-registry-" + url.getHost() + ".cache");
         String appName = url.getParameter(Constants.APPLICATION_KEY);
         if(appName != null && !(appName.trim().equals(""))){
         	String keyReplace = "dubbo-registry-";
-        	filename = filename.replace(keyReplace, keyReplace+appName);
+        	filename = filename.replace(keyReplace, keyReplace+appName+"-");
         }
         File file = null;
         if (ConfigUtils.isNotEmpty(filename)) {
@@ -489,6 +491,7 @@ public abstract class AbstractRegistry implements Registry {
         if (logger.isInfoEnabled()){
             logger.info("Destroy registry:" + getUrl());
         }
+    	registryCacheExecutor.shutdown();
         Set<URL> destroyRegistered = new HashSet<URL>(getRegistered());
         if (! destroyRegistered.isEmpty()) {
             for (URL url : new HashSet<URL>(getRegistered())) {

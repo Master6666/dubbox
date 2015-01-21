@@ -25,6 +25,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.ExecutorManager;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.remoting.Channel;
@@ -281,7 +282,7 @@ public class DefaultFuture implements ResponseFuture {
     private static class RemotingInvocationTimeoutScan implements Runnable {
 
         public void run() {
-            while (true) {
+            while (!ExecutorManager.destroyed) {
                 try {
                     for (DefaultFuture future : FUTURES.values()) {
                         if (future == null || future.isDone()) {

@@ -18,7 +18,6 @@ package com.alibaba.dubbo.config.spring.schema;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 import com.alibaba.dubbo.common.Version;
-import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ConsumerConfig;
 import com.alibaba.dubbo.config.ModuleConfig;
 import com.alibaba.dubbo.config.MonitorConfig;
@@ -26,6 +25,7 @@ import com.alibaba.dubbo.config.ProtocolConfig;
 import com.alibaba.dubbo.config.ProviderConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.spring.AnnotationBean;
+import com.alibaba.dubbo.config.spring.ApplicationBean;
 import com.alibaba.dubbo.config.spring.ReferenceBean;
 import com.alibaba.dubbo.config.spring.ServiceBean;
 
@@ -42,7 +42,8 @@ public class DubboNamespaceHandler extends NamespaceHandlerSupport {
 	}
 
 	public void init() {
-	    registerBeanDefinitionParser("application", new DubboBeanDefinitionParser(ApplicationConfig.class, true));
+//	    registerBeanDefinitionParser("application", new DubboBeanDefinitionParser(ApplicationConfig.class, true));
+	    registerBeanDefinitionParser("application", new DubboBeanDefinitionParser(ApplicationBean.class, true));
         registerBeanDefinitionParser("module", new DubboBeanDefinitionParser(ModuleConfig.class, true));
         registerBeanDefinitionParser("registry", new DubboBeanDefinitionParser(RegistryConfig.class, true));
         registerBeanDefinitionParser("monitor", new DubboBeanDefinitionParser(MonitorConfig.class, true));

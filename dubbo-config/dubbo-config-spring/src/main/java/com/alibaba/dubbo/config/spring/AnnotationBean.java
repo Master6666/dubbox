@@ -115,9 +115,13 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
     }
 
     public void destroy() throws Exception {
+        ApplicationConfig  theApplicationConfig = null;
         for (ServiceConfig<?> serviceConfig : serviceConfigs) {
             try {
                 serviceConfig.unexport();
+                if(theApplicationConfig == null){
+                	theApplicationConfig =  serviceConfig.getApplication();
+                }
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
             }
@@ -125,10 +129,18 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
         for (ReferenceConfig<?> referenceConfig : referenceConfigs.values()) {
             try {
                 referenceConfig.destroy();
+                if(theApplicationConfig == null){
+                	theApplicationConfig =  referenceConfig.getApplication();
+                }
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
             }
         }
+		if (theApplicationConfig != null) {
+			if (theApplicationConfig instanceof ApplicationBean) {
+				((ApplicationBean) theApplicationConfig).destroy();
+			}
+		}
     }
 
     public Object postProcessAfterInitialization(Object bean, String beanName)

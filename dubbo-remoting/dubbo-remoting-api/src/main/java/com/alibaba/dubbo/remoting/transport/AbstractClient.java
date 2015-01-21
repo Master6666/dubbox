@@ -27,6 +27,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.ExecutorManager;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.Version;
 import com.alibaba.dubbo.common.extension.ExtensionLoader;
@@ -82,6 +83,7 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
     
     public AbstractClient(URL url, ChannelHandler handler) throws RemotingException {
         super(url, handler);
+        ExecutorManager.put(this.getClass().getName(), reconnectExecutorService);
         
         send_reconnect = url.getParameter(Constants.SEND_RECONNECT_KEY, false);
         
