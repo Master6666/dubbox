@@ -24,6 +24,7 @@
 	<artifactId>dubbo-monitor-simple</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
+	<version>${my.dubbotag.version}</version>
 	<description>The simple monitor module of dubbo project</description>
 	<properties>
 		<skip_maven_deploy>false</skip_maven_deploy>
@@ -32,7 +33,10 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>dubbo</artifactId>
+		<!--
 			<version>${project.parent.version}</version>
+			-->
+			<version>${my.dubbotag.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>jfree</groupId>
@@ -151,7 +155,10 @@
 								<artifactItem>
 									<groupId>com.alibaba</groupId>
 									<artifactId>dubbo</artifactId>
+									<!--
 									<version>${project.parent.version}</version>
+									-->
+									<version>${my.dubbotag.version}</version>
 									<outputDirectory>${project.build.directory}/dubbo</outputDirectory>
 									<includes>META-INF/assembly/**</includes>
 								</artifactItem>

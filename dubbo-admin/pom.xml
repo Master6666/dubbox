@@ -24,6 +24,7 @@
 	<artifactId>dubbo-admin</artifactId>
 	<packaging>war</packaging>
 	<name>${project.artifactId}</name>
+	<version>${my.dubbotag.version}</version>
 	<description>The admin module of dubbo project</description>
 	<properties>
 		<wtpversion>1.5</wtpversion>
@@ -35,7 +36,10 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>dubbo</artifactId>
+			<!--
 			<version>${project.parent.version}</version>
+			-->
+			<version>${my.dubbotag.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alibaba.citrus</groupId>
