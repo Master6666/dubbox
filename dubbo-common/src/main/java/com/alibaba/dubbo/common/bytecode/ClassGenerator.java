@@ -312,7 +312,19 @@ public final class ClassGenerator
 				mCtc.setSuperclass(ctcs);
 			mCtc.addInterface(mPool.get(DC.class.getName())); // add dynamic class tag.
 			if( mInterfaces != null )
-				for( String cl : mInterfaces ) mCtc.addInterface(mPool.get(cl));
+				for( String cl : mInterfaces ) {
+					try {
+						mCtc.addInterface(mPool.get(cl));
+					} catch (Exception e) {
+						String exceptionMessage = e.getMessage()
+										+ "(Thread.currentThread().getContextClassLoader()="
+										+ Thread.currentThread()
+												.getContextClassLoader()
+										+ ",cl=)" + cl;
+			            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(exceptionMessage);
+						throw new RuntimeException(exceptionMessage, e);
+					}
+				}
 			if( mFields != null )
 				for( String code : mFields ) mCtc.addField(CtField.make(code, mCtc));
 			if( mMethods != null )
@@ -346,11 +358,13 @@ public final class ClassGenerator
 		}
 		catch(RuntimeException e)
 		{
-			throw e;
+//			throw e;
+			throw new RuntimeException(e.getMessage()+"(,Thread.currentThread().getContextClassLoader()=" + Thread.currentThread().getContextClassLoader()+")", e);
 		}
 		catch(NotFoundException e)
 		{
-			throw new RuntimeException(e.getMessage(), e);
+			
+			throw new RuntimeException(e.getMessage()+"(,Thread.currentThread().getContextClassLoader()=" + Thread.currentThread().getContextClassLoader()+")", e);
 		}
 		catch(CannotCompileException e)
 		{

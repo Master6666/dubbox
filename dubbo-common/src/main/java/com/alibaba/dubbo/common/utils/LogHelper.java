@@ -172,6 +172,27 @@ public class LogHelper {
             logger.error(msg, e);
         }
     }
+    
+    public static void stackTrace(String message,Exception e){
+    	if(message == null || message.trim().equals("")){
+    		message = "";
+    	}
+		if(e != null){
+			message = message +"("+ e.getLocalizedMessage()+")";
+			e.printStackTrace();
+		}
+
+    	message = "YHJ STACKTRACE :message=[" + message + "]";
+	    try {
+			throw new Exception(message);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+    }
+    
+    public static void stackTrace(String message){
+    	stackTrace(message,null);
+    }
 
     private LogHelper() {
     }

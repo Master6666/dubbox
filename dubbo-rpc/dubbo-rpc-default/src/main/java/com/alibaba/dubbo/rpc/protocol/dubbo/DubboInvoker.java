@@ -96,8 +96,10 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
                 return (Result) currentClient.request(inv, timeout).get();
             }
         } catch (TimeoutException e) {
+            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(null,e);
             throw new RpcException(RpcException.TIMEOUT_EXCEPTION, "Invoke remote method timeout. method: " + invocation.getMethodName() + ", provider: " + getUrl() + ", cause: " + e.getMessage(), e);
         } catch (RemotingException e) {
+            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(null,e);
             throw new RpcException(RpcException.NETWORK_EXCEPTION, "Failed to invoke remote method: " + invocation.getMethodName() + ", provider: " + getUrl() + ", cause: " + e.getMessage(), e);
         }
     }

@@ -94,9 +94,20 @@ public abstract class Proxy
 			catch(ClassNotFoundException e)
 			{}
 
-			if( tmp != ics[i] )
-				throw new IllegalArgumentException(ics[i] + " is not visible from class loader");
+			if( tmp != ics[i] ){
+	            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(" tmp != ics["+i+"],cl="+cl+",itf="+itf);
+				try
+				{
+					tmp = Class.forName(itf, false, Thread.currentThread().getContextClassLoader());
+				}
+				catch(ClassNotFoundException e)
+				{
+		            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(" tmp != ics["+i+"],Thread.currentThread().getContextClassLoader()="+Thread.currentThread().getContextClassLoader()+",itf="+itf);
+				}
 
+			}
+			if( tmp != ics[i] )
+				throw new IllegalArgumentException(ics[i] + " is not visible from class loader.cl=" + cl +",Thread.currentThread().getContextClassLoader()=" + Thread.currentThread().getContextClassLoader());
 		    sb.append(itf).append(';');
 		}
 
