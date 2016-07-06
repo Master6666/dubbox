@@ -64,7 +64,11 @@ public abstract class Proxy
 	 */
 	public static Proxy getProxy(Class<?>... ics)
 	{
-		return getProxy(ClassHelper.getCallerClassLoader(Proxy.class), ics);
+		try {
+			return getProxy(ClassHelper.getCallerClassLoader(Proxy.class), ics);
+		} catch (Throwable e) {
+			return getProxy(Thread.currentThread().getContextClassLoader(), ics);
+		}
 	}
 
 	/**
