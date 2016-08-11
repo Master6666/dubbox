@@ -72,7 +72,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
             if (data == null) msg = null;
             else if (data instanceof Throwable) msg = StringUtils.toString((Throwable) data);
             else msg = data.toString();
-            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(null);
+            com.alibaba.dubbo.common.utils.LogHelper.stackTrace("req.isBroken(),msg="+msg);
             res.setErrorMessage("Fail to decode request due to: " + msg);
             res.setStatus(Response.BAD_REQUEST);
 

@@ -160,7 +160,19 @@ public class DecodeableRpcInvocation extends RpcInvocation implements Codec, Dec
                 setArguments(args);
 
             } catch (ClassNotFoundException e) {
-                throw new IOException(StringUtils.toString("Read invocation data failed.", e));
+            	try {
+					log.error("ClassNotFoundException(path="+getAttachment(Constants.PATH_KEY)+",method="+getMethodName(),e);
+				} catch (Throwable e1) {
+					e1.printStackTrace();
+				}
+            	throw new IOException(StringUtils.toString("Read invocation data failed.", e));
+            } catch (Throwable e) {
+            	try {
+            		log.error("Throwable(path="+getAttachment(Constants.PATH_KEY)+",method="+getMethodName(),e);
+				} catch (Throwable e1) {
+					e1.printStackTrace();
+				}
+            	throw new IOException(StringUtils.toString("Read invocation data failed.", e));
             }
         } finally {
             // modified by lishen
