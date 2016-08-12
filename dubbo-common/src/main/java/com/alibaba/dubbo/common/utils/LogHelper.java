@@ -174,6 +174,12 @@ public class LogHelper {
     }
     
     public static void stackTrace(String message,Exception e){
+    	stackTrace(null,message,e);
+    }
+    public static void stackTrace(Logger logger,String message,Exception e){
+    	if(logger != null && !logger.isDebugEnabled()){
+    		return;
+    	}
     	if(message == null || message.trim().equals("")){
     		message = "";
     	}
@@ -182,7 +188,10 @@ public class LogHelper {
 			e.printStackTrace();
 		}
 
-    	message = "YHJ STACKTRACE :message=[" + message + "]";
+    	message = "LOGHELPER STACKTRACE :message=[" + message + "]";
+    	if(logger !=null && logger.isDebugEnabled()){
+    		logger.debug(message);
+    	}
 	    try {
 			throw new Exception(message);
 		} catch (Exception e1) {
@@ -192,6 +201,10 @@ public class LogHelper {
     
     public static void stackTrace(String message){
     	stackTrace(message,null);
+    }
+
+    public static void stackTrace(Logger logger, String message){
+    	stackTrace(logger,message,null);
     }
 
     private LogHelper() {

@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.alibaba.dubbo.common.logger.Logger;
+import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.ClassHelper;
 import com.alibaba.dubbo.common.utils.ReflectUtils;
 
@@ -99,7 +101,8 @@ public abstract class Proxy
 			{}
 
 			if( tmp != ics[i] ){
-	            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(" tmp != ics["+i+"],cl="+cl+",itf="+itf);
+				Logger logger = LoggerFactory.getLogger(Proxy.class);
+				com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger," tmp != ics["+i+"],cl="+cl+",itf="+itf);
 				try
 				{
 					tmp = Class.forName(itf, false, Thread.currentThread().getContextClassLoader());
