@@ -23,6 +23,7 @@ import java.util.Map;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
+import com.alibaba.dubbo.common.Version;
 
 /**
  * RPC Invocation.
@@ -71,6 +72,25 @@ public class RpcInvocation implements Invocation, Serializable {
             }
             if (url.hasParameter(Constants.APPLICATION_KEY)) {
                 setAttachment(Constants.APPLICATION_KEY, url.getParameter(Constants.APPLICATION_KEY));
+            }
+            
+            //Add by yihaijun at 2016-08-16.For compatibility with older
+            if (url.hasParameter(Constants.DUBBO_VERSION_KEY)) {
+                setAttachment(Constants.DUBBO_VERSION_KEY, url.getParameter(Constants.DUBBO_VERSION_KEY));
+            }
+            if (url.hasParameter(Constants.REFER_KEY)) {
+            	String serviceDubboVersion =  url.getParameter(Constants.REFER_KEY);
+            	try {
+            		String locaClientVBeginTag = "revision%3D";
+            		String locaClientVEndTag = "%26";
+            		int locaClientVBeginPos = serviceDubboVersion.indexOf(locaClientVBeginTag)+locaClientVBeginTag.length();
+            		int locaClientVEndPos = serviceDubboVersion.indexOf(locaClientVEndTag,locaClientVBeginPos);
+            		serviceDubboVersion=serviceDubboVersion.substring(locaClientVBeginPos,locaClientVEndPos);
+    			} catch (Exception e) {
+    				com.alibaba.dubbo.common.utils.LogHelper.stackTrace(null,"serviceDubboVersion="+serviceDubboVersion,e);
+    				serviceDubboVersion=Version.getVersion(RpcInvocation.class, Version.getVersion());
+    			}
+                setAttachment(Constants.SERVICE_DUBBO_VERSION_KEY, serviceDubboVersion);
             }
         }
     }

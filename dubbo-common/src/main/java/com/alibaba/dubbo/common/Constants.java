@@ -593,6 +593,9 @@ public class Constants {
 
     public static final String GENERIC_SERIALIZATION_BEAN          = "bean";
 
+//  Add by yihaijun at 2016-08-16.For compatibility with older
+    public static final String  SERVICE_DUBBO_VERSION_KEY          = "service.dubbo.version";
+    
     /*
      * private Constants(){ }
      */
