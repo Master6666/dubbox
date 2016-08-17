@@ -20,6 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
+import com.alibaba.dubbo.common.Version;
 import com.alibaba.dubbo.common.utils.AtomicPositiveInteger;
 import com.alibaba.dubbo.remoting.RemotingException;
 import com.alibaba.dubbo.remoting.TimeoutException;
@@ -72,6 +73,14 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
         inv.setAttachment(Constants.PATH_KEY, getUrl().getPath());
         inv.setAttachment(Constants.VERSION_KEY, version);
         
+        //Add by yihaijun at 2016-08-17.For compatibility with older
+        String serviceDubboVersion=Version.getVersion(RpcInvocation.class, Version.getVersion());
+        com.alibaba.dubbo.common.URL url=getUrl();
+        if (url.hasParameter(Constants.DUBBO_VERSION_KEY)) {
+            serviceDubboVersion=url.getParameter(Constants.DUBBO_VERSION_KEY);;
+        }
+        inv.setAttachment(Constants.SERVICE_DUBBO_VERSION_KEY, serviceDubboVersion);
+
         ExchangeClient currentClient;
         if (clients.length == 1) {
             currentClient = clients[0];
