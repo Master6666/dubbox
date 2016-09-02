@@ -17,6 +17,7 @@
 package com.alibaba.dubbo.common.utils;
 
 import com.alibaba.dubbo.common.logger.Logger;
+import com.alibaba.dubbo.common.logger.LoggerFactory;
 
 /**
  * @author <a href="mailto:gang.lvg@alibaba-inc.com">kimi</a>
@@ -176,8 +177,11 @@ public class LogHelper {
     public static void stackTrace(String message,Exception e){
     	stackTrace(null,message,e);
     }
+    
+	private static Logger traceLog = LoggerFactory.getLogger("com.alibaba.dubbo.common.logger.Logger.Loghelper.stackTrace");
+
     public static void stackTrace(Logger logger,String message,Exception e){
-    	if(logger != null && !logger.isDebugEnabled()){
+    	if(logger != null && !logger.isTraceEnabled()){
     		return;
     	}
     	if(message == null || message.trim().equals("")){
@@ -185,17 +189,26 @@ public class LogHelper {
     	}
 		if(e != null){
 			message = message +"("+ e.getLocalizedMessage()+")";
-			e.printStackTrace();
 		}
 
-    	message = "LOGHELPER STACKTRACE :message=[" + message + "]";
-    	if(logger !=null && logger.isDebugEnabled()){
-    		logger.debug(message);
-    	}
+    	message = "LOGHELPER STACKTRACE:[" + message + "]";
 	    try {
-			throw new Exception(message);
+			throw new Exception("SimulationException");
 		} catch (Exception e1) {
-			e1.printStackTrace();
+	    	try {
+	    		Logger log = null;
+				if(logger !=null && logger.isTraceEnabled()){
+					log = logger;
+				}else{
+					log = traceLog;
+				}
+				if(log.isWarnEnabled()){
+					log.trace(message,e1);
+				}
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+			
 		}
     }
     

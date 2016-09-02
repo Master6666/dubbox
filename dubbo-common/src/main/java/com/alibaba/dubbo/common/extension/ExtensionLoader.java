@@ -607,10 +607,12 @@ public class ExtensionLoader<T> {
             if (urls != null) {
                 while (urls.hasMoreElements()) {
                     java.net.URL url = urls.nextElement();
+                    com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+") url.getFile()="+url.getFile());
                     try {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "utf-8"));
                         try {
                             String line = null;
+                            int iCount = 0;
                             while ((line = reader.readLine()) != null) {
                                 final int ci = line.indexOf('#');
                                 if (ci >= 0) line = line.substring(0, ci);
@@ -623,6 +625,7 @@ public class ExtensionLoader<T> {
                                             name = line.substring(0, i).trim();
                                             line = line.substring(i + 1).trim();
                                         }
+                                    	iCount++;
                                         if (line.length() > 0) {
                                             Class<?> clazz = Class.forName(line, true, classLoader);
                                             if (! type.isAssignableFrom(clazz)) {
@@ -631,6 +634,7 @@ public class ExtensionLoader<T> {
                                                         + clazz.getName() + "is not subtype of interface.");
                                             }
                                             if (clazz.isAnnotationPresent(Adaptive.class)) {
+                                                com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+")\r\ncachedAdaptiveClass="+ cachedAdaptiveClass + ",clazz="+clazz);
                                                 if(cachedAdaptiveClass == null) {
                                                     cachedAdaptiveClass = clazz;
                                                 } else if (! cachedAdaptiveClass.equals(clazz)) {
@@ -687,6 +691,7 @@ public class ExtensionLoader<T> {
                                     }
                                 }
                             } // end of while read lines
+                            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+"),effective number of rows is "+iCount);
                         } finally {
                             reader.close();
                         }

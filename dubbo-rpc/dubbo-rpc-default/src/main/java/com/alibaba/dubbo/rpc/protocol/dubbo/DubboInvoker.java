@@ -77,7 +77,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
         String serviceDubboVersion=Version.getVersion(RpcInvocation.class, Version.getVersion());
         com.alibaba.dubbo.common.URL url=getUrl();
         if (url.hasParameter(Constants.DUBBO_VERSION_KEY)) {
-            serviceDubboVersion=url.getParameter(Constants.DUBBO_VERSION_KEY);;
+            serviceDubboVersion=url.getParameter(Constants.DUBBO_VERSION_KEY);
         }
         inv.setAttachment(Constants.SERVICE_DUBBO_VERSION_KEY, serviceDubboVersion);
 
