@@ -607,7 +607,9 @@ public class ExtensionLoader<T> {
             if (urls != null) {
                 while (urls.hasMoreElements()) {
                     java.net.URL url = urls.nextElement();
-                    com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+") url.getFile()="+url.getFile());
+                    if(logger.isTraceEnabled()){
+                    	logger.trace("loadFile("+fileName+") url.getFile()="+url.getFile());
+                    }
                     try {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "utf-8"));
                         try {
@@ -627,14 +629,27 @@ public class ExtensionLoader<T> {
                                         }
                                     	iCount++;
                                         if (line.length() > 0) {
-                                            Class<?> clazz = Class.forName(line, true, classLoader);
+                                            Class<?> clazz = null;
+											try {
+												clazz = Class.forName(line, true, classLoader);
+											} catch (Throwable e1) {
+							                    com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+") Class.forName("+line +") Throwable 1(classLoader="+classLoader+")("+e1.toString()+"):",e1);
+							                    try {
+													clazz = Thread.currentThread().getContextClassLoader().getClass().forName(line, true, Thread.currentThread().getContextClassLoader());
+												} catch (Throwable t) {
+								                    com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+") Class.forName("+line +") Throwable 2(classLoader="+classLoader+"),Thread.currentThread().getContextClassLoader()="+Thread.currentThread().getContextClassLoader()+")(" + t.toString() +")",t);
+													clazz = Thread.currentThread().getContextClassLoader().getClass().forName(line, false, Thread.currentThread().getContextClassLoader());
+												}
+											}
                                             if (! type.isAssignableFrom(clazz)) {
                                                 throw new IllegalStateException("Error when load extension class(interface: " +
                                                         type + ", class line: " + clazz.getName() + "), class " 
                                                         + clazz.getName() + "is not subtype of interface.");
                                             }
                                             if (clazz.isAnnotationPresent(Adaptive.class)) {
-                                                com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+")\r\ncachedAdaptiveClass="+ cachedAdaptiveClass + ",clazz="+clazz);
+                                                if(logger.isTraceEnabled()){
+                                                	logger.trace("loadFile("+fileName+")\r\ncachedAdaptiveClass="+ cachedAdaptiveClass + ",clazz="+clazz);
+                                                }
                                                 if(cachedAdaptiveClass == null) {
                                                     cachedAdaptiveClass = clazz;
                                                 } else if (! cachedAdaptiveClass.equals(clazz)) {
@@ -686,12 +701,15 @@ public class ExtensionLoader<T> {
                                             }
                                         }
                                     } catch (Throwable t) {
-                                        IllegalStateException e = new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.getMessage(), t);
+					                    com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+") Class.forName("+line +") Throwable 3(classLoader="+classLoader+"),Thread.currentThread().getContextClassLoader()="+Thread.currentThread().getContextClassLoader()+")(" + t.toString() +")",t);
+                                        IllegalStateException e = new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.toString() +",classLoader="+classLoader+",Thread.currentThread().getContextClassLoader()="+Thread.currentThread().getContextClassLoader(), t);
                                         exceptions.put(line, e);
                                     }
                                 }
                             } // end of while read lines
-                            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"loadFile("+fileName+"),effective number of rows is "+iCount);
+                            if(logger.isTraceEnabled()){
+                            	logger.trace("loadFile("+fileName+"),effective number of rows is "+iCount);
+                            }
                         } finally {
                             reader.close();
                         }

@@ -174,13 +174,13 @@ public class LogHelper {
         }
     }
     
-    public static void stackTrace(String message,Exception e){
+    public static void stackTrace(String message,Throwable e){
     	stackTrace(null,message,e);
     }
     
 	private static Logger traceLog = LoggerFactory.getLogger("com.alibaba.dubbo.common.logger.Logger.Loghelper.stackTrace");
 
-    public static void stackTrace(Logger logger,String message,Exception e){
+    public static void stackTrace(Logger logger,String message,Throwable e){
     	if(logger != null && !logger.isTraceEnabled()){
     		return;
     	}
@@ -188,15 +188,19 @@ public class LogHelper {
     		message = "";
     	}
 		if(e != null){
-			message = message +"("+ e.getLocalizedMessage()+")";
+			message = message +"("+ e.getMessage()+")";
 		}
 
     	message = "LOGHELPER STACKTRACE:[" + message + "]";
 	    try {
-			throw new Exception("SimulationException");
-		} catch (Exception e1) {
+	    	if(e != null){
+				throw new Throwable("SimulationException",e);
+	    	}else{
+				throw new Throwable("SimulationException");
+	    	}
+		} catch (Throwable e1) {
 	    	try {
-	    		Logger log = null;
+		    	Logger log = null;
 				if(logger !=null && logger.isTraceEnabled()){
 					log = logger;
 				}else{
@@ -205,7 +209,7 @@ public class LogHelper {
 				if(log.isWarnEnabled()){
 					log.trace(message,e1);
 				}
-			} catch (Exception e2) {
+			} catch (Throwable e2) {
 				e2.printStackTrace();
 			}
 			
