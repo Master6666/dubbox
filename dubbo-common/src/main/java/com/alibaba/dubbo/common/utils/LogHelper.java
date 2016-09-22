@@ -188,7 +188,7 @@ public class LogHelper {
     		message = "";
     	}
 		if(e != null){
-			message = message +"("+ e.getMessage()+")";
+			message = message +"("+ e.toString()+")";
 		}
 
     	message = "LOGHELPER STACKTRACE:[" + message + "]";

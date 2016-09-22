@@ -316,12 +316,12 @@ public final class ClassGenerator
 					try {
 						mCtc.addInterface(mPool.get(cl));
 					} catch (Exception e) {
-						String exceptionMessage = e.getMessage()
-										+ "(Thread.currentThread().getContextClassLoader()="
-										+ Thread.currentThread()
-												.getContextClassLoader()
-										+ ",cl=)" + cl;
-			            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(exceptionMessage);
+						String exceptionMessage = e.toString()
+						+ "(Thread.currentThread().getContextClassLoader()="
+						+ Thread.currentThread()
+								.getContextClassLoader()
+						+ ",cl=" + cl+",mClassName="+mClassName+",mSuperClass="+mSuperClass+")";
+						com.alibaba.dubbo.common.utils.LogHelper.stackTrace(exceptionMessage,e);
 						throw new RuntimeException(exceptionMessage, e);
 					}
 				}
