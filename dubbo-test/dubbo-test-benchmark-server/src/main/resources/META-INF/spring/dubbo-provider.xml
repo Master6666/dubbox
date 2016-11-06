@@ -8,7 +8,22 @@
 
     <dubbo:application name="demo-provider" owner="shenli" organization="dangdang"/>
 
+    <!--
+    Edit by yihaijun at 2016-10-09 
     <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
+    -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath*:/*.properties</value>
+				<value>classpath*:/properties/*.properties</value>
+				<value>file://${user.home}/dubbo-test-benchmark.properties</value>
+				<value>file://${user.dir}/../dubbo-test-benchmark.properties</value>
+			</list>
+		</property>
+	</bean>
+	<dubbo:registry address="${dubbo.registry.address}" check="false" />
 
     <!--<dubbo:monitor protocol="registry"/>-->
 

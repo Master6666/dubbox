@@ -364,6 +364,7 @@ public abstract class AbstractConfig implements Serializable {
         checkName(property, value);
         if (value != null && value.length() > 0 
                 && ! ExtensionLoader.getExtensionLoader(type).hasExtension(value)) {
+            com.alibaba.dubbo.common.utils.LogHelper.stackTrace(null,"checkExtension("+type+","+property +","+value+") begin throw new IllegalStateException...");
             throw new IllegalStateException("No such extension " + value + " for " + property + "/" + type.getName());
         }
     }

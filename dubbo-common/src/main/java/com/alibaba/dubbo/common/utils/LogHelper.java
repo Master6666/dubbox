@@ -181,9 +181,16 @@ public class LogHelper {
 	private static Logger traceLog = LoggerFactory.getLogger("com.alibaba.dubbo.common.logger.Logger.Loghelper.stackTrace");
 
     public static void stackTrace(Logger logger,String message,Throwable e){
-    	if(logger != null && !logger.isTraceEnabled()){
+    	Logger log = null;
+		if(logger !=null ){
+			log = logger;
+		}else{
+			log = traceLog;
+		}
+    	if(!log.isDebugEnabled()){
     		return;
     	}
+    	
     	if(message == null || message.trim().equals("")){
     		message = "";
     	}
@@ -199,20 +206,11 @@ public class LogHelper {
 				throw new Throwable("SimulationException");
 	    	}
 		} catch (Throwable e1) {
-	    	try {
-		    	Logger log = null;
-				if(logger !=null && logger.isTraceEnabled()){
-					log = logger;
-				}else{
-					log = traceLog;
-				}
-				if(log.isWarnEnabled()){
-					log.trace(message,e1);
-				}
-			} catch (Throwable e2) {
-				e2.printStackTrace();
+			if(log.isTraceEnabled()){
+				log.trace(message,e1);
+			}else{
+				log.debug(message);
 			}
-			
 		}
     }
     

@@ -753,6 +753,17 @@
 				<xsd:documentation><![CDATA[ The thread pool size. ]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="corethreads" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[ the core number of threads. ]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="keepalivetime" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[ when the number of threads is greater than the core,
+				 this is the maximum time that excess idle threads will wait for new tasks before terminating. ]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		<xsd:attribute name="iothreads" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[ The IO thread pool size. ]]></xsd:documentation>

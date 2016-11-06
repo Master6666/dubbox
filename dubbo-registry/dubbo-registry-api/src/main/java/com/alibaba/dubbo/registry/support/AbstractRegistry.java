@@ -44,6 +44,7 @@ import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.alibaba.dubbo.common.utils.ConfigUtils;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.common.utils.NamedThreadFactory;
 import com.alibaba.dubbo.common.utils.UrlUtils;
 import com.alibaba.dubbo.registry.NotifyListener;
@@ -89,11 +90,12 @@ public abstract class AbstractRegistry implements Registry {
     private final ConcurrentMap<URL, Map<String, List<URL>>> notified = new ConcurrentHashMap<URL, Map<String, List<URL>>>();
 
     public AbstractRegistry(URL url) {
+    	LogHelper.stackTrace("url="+url);
         setUrl(url);
     	ExecutorManager.put(registryCacheExecutor.toString(), registryCacheExecutor);
         // 启动文件保存定时器
         syncSaveFile = url.getParameter(Constants.REGISTRY_FILESAVE_SYNC_KEY, false);
-        String filename = url.getParameter(Constants.FILE_KEY, System.getProperty("user.home") + "/.dubbo/dubbo-registry-" + url.getHost() + ".cache");
+        String filename = url.getParameter(Constants.FILE_KEY, System.getProperty("user.home") + "/.dubbo/dubbo-registry-" + url.getHost() + "-" +url.getPort() + ".cache");
         String appName = url.getParameter(Constants.APPLICATION_KEY);
         if(appName != null && !(appName.trim().equals(""))){
         	String keyReplace = "dubbo-registry-";

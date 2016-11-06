@@ -215,6 +215,7 @@ public class Constants {
     public static final String  IO_THREADS_KEY                     = "iothreads";
 
     public static final String  CORE_THREADS_KEY                   = "corethreads";
+    public static final String  KEEP_ALIVE_TIME_KEY                = "keepalivetime";
 
     public static final String  THREADS_KEY                        = "threads";
 

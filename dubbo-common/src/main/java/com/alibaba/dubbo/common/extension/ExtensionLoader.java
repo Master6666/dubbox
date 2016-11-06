@@ -608,7 +608,7 @@ public class ExtensionLoader<T> {
                 while (urls.hasMoreElements()) {
                     java.net.URL url = urls.nextElement();
                     if(logger.isTraceEnabled()){
-                    	logger.trace("loadFile("+fileName+") url.getFile()="+url.getFile());
+                    	logger.trace("loadFile("+fileName+"):url.getFile()="+url.getFile() + ",classLoader="+classLoader +",Thread.currentThread().getContextClassLoader()="+Thread.currentThread().getContextClassLoader());
                     }
                     try {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "utf-8"));
@@ -968,8 +968,25 @@ public class ExtensionLoader<T> {
         return codeBuidler.toString();
     }
 
+    private static boolean isClassLoaderEquals(ClassLoader cl1,ClassLoader cl2){
+        ClassLoader acl = cl1;
+        do {
+            acl = acl.getParent();
+            if (cl2 == acl) {
+                return true;
+            }
+        } while (acl != null);
+    	return false;
+    }
+    
     private static ClassLoader findClassLoader() {
-        return  ExtensionLoader.class.getClassLoader();
+    	//Edit by yihaijun at 2016.10.11.In order to load more resources
+//        return  ExtensionLoader.class.getClassLoader();
+    	ClassLoader classLoader = ExtensionLoader.class.getClassLoader();
+    	if (classLoader != null && isClassLoaderEquals(Thread.currentThread().getContextClassLoader(),classLoader)){
+    		classLoader = Thread.currentThread().getContextClassLoader();
+    	}
+    	return classLoader;
     }
     
     @Override

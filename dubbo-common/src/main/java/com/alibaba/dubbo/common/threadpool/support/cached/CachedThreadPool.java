@@ -40,8 +40,13 @@ public class CachedThreadPool implements ThreadPool {
         int cores = url.getParameter(Constants.CORE_THREADS_KEY, Constants.DEFAULT_CORE_THREADS);
         int threads = url.getParameter(Constants.THREADS_KEY, Integer.MAX_VALUE);
         int queues = url.getParameter(Constants.QUEUES_KEY, Constants.DEFAULT_QUEUES);
-        int alive = url.getParameter(Constants.ALIVE_KEY, Constants.DEFAULT_ALIVE);
-        return new ThreadPoolExecutor(cores, threads, alive, TimeUnit.MILLISECONDS, 
+        //Edit by yihaijun at 2016-09-28
+        //According to dubbo.xsd, ProtocolType has the attribute of keepalive,
+        //we can get it from URL to set the parameter of ThreadPoolExecutor keepAliveTime 
+        //int alive = url.getParameter(Constants.ALIVE_KEY, Constants.DEFAULT_ALIVE);
+        int keepAliveTime = url.getParameter(Constants.KEEP_ALIVE_TIME_KEY, Constants.DEFAULT_ALIVE);
+        com.alibaba.dubbo.common.utils.LogHelper.stackTrace(null,"Now begin new ThreadPoolExecutor("+cores + "," + threads + "," + keepAliveTime +",..)(CachedThreadPool)...");
+        return new ThreadPoolExecutor(cores, threads, keepAliveTime, TimeUnit.MILLISECONDS, 
         		queues == 0 ? new SynchronousQueue<Runnable>() : 
         			(queues < 0 ? new LinkedBlockingQueue<Runnable>() 
         					: new LinkedBlockingQueue<Runnable>(queues)),

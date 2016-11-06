@@ -269,7 +269,9 @@ public class DubboProtocol extends AbstractProtocol {
             return;
         }
 
-        logger.info("Optimizing the serialization process for Kryo, FST, etc...");
+        if(logger.isDebugEnabled()){
+        	logger.debug("Optimizing the serialization process for Kryo, FST, etc...");
+        }
 
         try {
             Class clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
@@ -289,11 +291,19 @@ public class DubboProtocol extends AbstractProtocol {
 
             optimizers.add(className);
         } catch (ClassNotFoundException e) {
+            if(logger.isDebugEnabled()){
+            	logger.debug("Cannot find the serialization optimizer class: " + className+"("+Thread.currentThread().getContextClassLoader()+")", e);
+            }
             throw new RpcException("Cannot find the serialization optimizer class: " + className, e);
         } catch (InstantiationException e) {
             throw new RpcException("Cannot instantiate the serialization optimizer class: " + className, e);
         } catch (IllegalAccessException e) {
             throw new RpcException("Cannot instantiate the serialization optimizer class: " + className, e);
+        } catch(Throwable e){
+            if(logger.isDebugEnabled()){
+            	logger.debug("optimizeSerialization Throwable. className=" + className, e);
+            }
+            throw new RpcException("optimizeSerialization Throwable. className=" + className+"("+Thread.currentThread().getContextClassLoader()+")", e);
         }
     }
     

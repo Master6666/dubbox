@@ -58,6 +58,13 @@ public class ProtocolConfig extends AbstractConfig {
     // 线程池大小(固定大小)
     private Integer             threads;
     
+    // the core number of threads
+    private Integer             corethreads;
+
+    // when the number of threads is greater than the core,
+    //this is the maximum time that excess idle threads will wait for new tasks before terminating.
+    private Integer             keepalivetime;
+
     // IO线程池大小(固定大小)
     private Integer             iothreads;
     
@@ -216,7 +223,35 @@ public class ProtocolConfig extends AbstractConfig {
         this.threads = threads;
     }
 
-    public Integer getIothreads() {
+    /**
+	 * @return the corethreads
+	 */
+	public Integer getCorethreads() {
+		return corethreads;
+	}
+
+	/**
+	 * @param corethreads the corethreads to set
+	 */
+	public void setCorethreads(Integer corethreads) {
+		this.corethreads = corethreads;
+	}
+
+	/**
+	 * @return the keepalivetime
+	 */
+	public Integer getKeepalivetime() {
+		return keepalivetime;
+	}
+
+	/**
+	 * @param keepalivetime the keepalivetime to set
+	 */
+	public void setKeepalivetime(Integer keepalivetime) {
+		this.keepalivetime = keepalivetime;
+	}
+
+	public Integer getIothreads() {
         return iothreads;
     }
 
