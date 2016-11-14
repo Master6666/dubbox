@@ -15,6 +15,8 @@
  */
 package com.alibaba.dubbo.remoting.http.jetty;
 
+import java.util.concurrent.TimeUnit;
+
 import com.alibaba.dubbo.remoting.http.servlet.ServletManager;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -59,6 +61,22 @@ public class JettyHttpServer extends AbstractHttpServer {
         threadPool.setMaxThreads(threads);
         threadPool.setMinThreads(threads);
 
+        int cores = url.getParameter(Constants.CORE_THREADS_KEY, Constants.DEFAULT_CORE_THREADS);
+        int maxThreads = url.getParameter(Constants.THREADS_KEY, Integer.MAX_VALUE);
+//        int queues = url.getParameter(Constants.QUEUES_KEY, Constants.DEFAULT_QUEUES);
+        int keepAliveTime = url.getParameter(Constants.KEEP_ALIVE_TIME_KEY, Constants.DEFAULT_ALIVE);
+//        threadPoolExecutor.setCorePoolSize(cores);
+//        threadPoolExecutor.setMaximumPoolSize(maxThreads);
+//        BlockingQueue<Runnable> workQueue = queues == 0 ? new SynchronousQueue<Runnable>() : 
+//			(queues < 0 ? new LinkedBlockingQueue<Runnable>() 
+//					: new LinkedBlockingQueue<Runnable>(queues));
+//        threadPoolExecutor.setKeepAliveTime(keepAliveTime,TimeUnit.MILLISECONDS);
+        com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"reset Now QueuedThreadPool:("+cores + "," + threads + "," + keepAliveTime+",..)");
+        threadPool.setMaxThreads(maxThreads);
+        threadPool.setMinThreads(cores);
+        threadPool.setMaxIdleTimeMs(keepAliveTime*3);
+
+        
         SelectChannelConnector connector = new SelectChannelConnector();
         if (! url.isAnyHost() && NetUtils.isValidLocalHost(url.getHost())) {
             connector.setHost(url.getHost());

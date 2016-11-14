@@ -17,8 +17,12 @@ package com.alibaba.dubbo.remoting.transport;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
@@ -26,6 +30,8 @@ import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.store.DataStore;
+import com.alibaba.dubbo.common.threadpool.ThreadPool;
+import com.alibaba.dubbo.common.threadpool.support.cached.CachedThreadPool;
 import com.alibaba.dubbo.common.utils.ExecutorUtil;
 import com.alibaba.dubbo.common.utils.NetUtils;
 import com.alibaba.dubbo.remoting.Channel;
@@ -113,19 +119,36 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
                 int threads = url.getParameter(Constants.THREADS_KEY, 0);
                 int max = threadPoolExecutor.getMaximumPoolSize();
                 int core = threadPoolExecutor.getCorePoolSize();
+                
+                com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"threads="+threads+",max="+max+",core="+core);
                 if (threads > 0 && (threads != max || threads != core)) {
+                    com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"threads > 0 && (threads != max || threads != core");
                     if (threads < core) {
+                        com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"threads < core");
                         threadPoolExecutor.setCorePoolSize(threads);
                         if (core == max) {
                             threadPoolExecutor.setMaximumPoolSize(threads);
                         }
                     } else {
+                        com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"!(threads < core)");
                         threadPoolExecutor.setMaximumPoolSize(threads);
                         if (core == max) {
                             threadPoolExecutor.setCorePoolSize(threads);
                         }
                     }
                 }
+                
+                int cores = url.getParameter(Constants.CORE_THREADS_KEY, Constants.DEFAULT_CORE_THREADS);
+                int maxThreads = url.getParameter(Constants.THREADS_KEY, Integer.MAX_VALUE);
+//                int queues = url.getParameter(Constants.QUEUES_KEY, Constants.DEFAULT_QUEUES);
+                int keepAliveTime = url.getParameter(Constants.KEEP_ALIVE_TIME_KEY, Constants.DEFAULT_ALIVE);
+                threadPoolExecutor.setCorePoolSize(cores);
+                threadPoolExecutor.setMaximumPoolSize(maxThreads);
+//                BlockingQueue<Runnable> workQueue = queues == 0 ? new SynchronousQueue<Runnable>() : 
+//        			(queues < 0 ? new LinkedBlockingQueue<Runnable>() 
+//        					: new LinkedBlockingQueue<Runnable>(queues));
+                threadPoolExecutor.setKeepAliveTime(keepAliveTime,TimeUnit.MILLISECONDS);
+                com.alibaba.dubbo.common.utils.LogHelper.stackTrace(logger,"reset Now threadPoolExecutor:("+cores + "," + threads + "," + keepAliveTime +",..)");
             }
         } catch (Throwable t) {
             logger.error(t.getMessage(), t);
