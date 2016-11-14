@@ -32,7 +32,8 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>dubbo</artifactId>
-			<version>${project.parent.version}</version>
+			<!--version>${project.parent.version}</version-->
+			<version>${my.dubbotag.version}</version>
 		</dependency>
 	</dependencies>
 </project>
