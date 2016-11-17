@@ -33,6 +33,7 @@ import com.alibaba.dubbo.common.Version;
 import com.alibaba.dubbo.common.bytecode.Wrapper;
 import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import com.alibaba.dubbo.common.utils.ConfigUtils;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.common.utils.NetUtils;
 import com.alibaba.dubbo.common.utils.ReflectUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
@@ -183,6 +184,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             checkInterfaceAndMethods(interfaceClass, methods);
         }
         String resolve = System.getProperty(interfaceName);
+        LogHelper.stackTrace(logger,"resolve=System.getProperty("+interfaceName+")="+resolve);
         String resolveFile = null;
         if (resolve == null || resolve.length() == 0) {
 	        resolveFile = System.getProperty("dubbo.resolve.file");
@@ -357,11 +359,13 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 logger.info("Using injvm service " + interfaceClass.getName());
             }
 		} else {
+	        LogHelper.stackTrace(logger,"url="+url);
             if (url != null && url.length() > 0) { // 用户指定URL，指定的URL可能是对点对直连地址，也可能是注册中心URL
                 String[] us = Constants.SEMICOLON_SPLIT_PATTERN.split(url);
                 if (us != null && us.length > 0) {
                     for (String u : us) {
                         URL url = URL.valueOf(u);
+            	        LogHelper.stackTrace(logger,"url="+url);
                         if (url.getPath() == null || url.getPath().length() == 0) {
                             url = url.setPath(interfaceName);
                         }
@@ -377,6 +381,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             	if (us != null && us.size() > 0) {
                 	for (URL u : us) {
                 	    URL monitorUrl = loadMonitor(u);
+            	        LogHelper.stackTrace(logger,"monitorUrl="+monitorUrl);
                         if (monitorUrl != null) {
                             map.put(Constants.MONITOR_KEY, URL.encode(monitorUrl.toFullString()));
                         }
@@ -388,6 +393,9 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 }
             }
 
+            if (logger.isTraceEnabled()) {
+                logger.trace("createProxy:urls.size()="+urls.size()+",urls.get(0).getAbsolutePath()="+urls.get(0).getAbsolutePath());
+            }
             if (urls.size() == 1) {
                 invoker = refprotocol.refer(interfaceClass, urls.get(0));
             } else {

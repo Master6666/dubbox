@@ -17,6 +17,7 @@ package com.alibaba.dubbo.rpc.protocol.rest;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.remoting.http.HttpBinder;
 import com.alibaba.dubbo.remoting.http.servlet.BootstrapListener;
@@ -182,6 +183,8 @@ public class RestProtocol extends AbstractProxyProtocol {
             }
         }
 
+        
+        LogHelper.stackTrace(null,"client.target(http://" + url.getHost() + ":" + url.getPort() + "/" + getContextPath(url) +") begin....");
         // TODO protocol
         ResteasyWebTarget target = client.target("http://" + url.getHost() + ":" + url.getPort() + "/" + getContextPath(url));
         return target.proxy(serviceType);
