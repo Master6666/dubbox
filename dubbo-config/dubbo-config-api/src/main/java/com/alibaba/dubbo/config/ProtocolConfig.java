@@ -21,6 +21,7 @@ import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import com.alibaba.dubbo.common.serialize.Serialization;
 import com.alibaba.dubbo.common.status.StatusChecker;
 import com.alibaba.dubbo.common.threadpool.ThreadPool;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.config.support.Parameter;
 import com.alibaba.dubbo.registry.support.AbstractRegistryFactory;
 import com.alibaba.dubbo.remoting.Dispatcher;
@@ -495,9 +496,13 @@ public class ProtocolConfig extends AbstractConfig {
     }
 
     public static void destroyAll() {
+    	LogHelper.stackTrace(logger,"destroyAll begin...");
         AbstractRegistryFactory.destroyAll();
+    	LogHelper.stackTrace(logger,"destroyAll:ExtensionLoader.getExtensionLoader(Protocol.class) begin...");
         ExtensionLoader<Protocol> loader = ExtensionLoader.getExtensionLoader(Protocol.class);
+    	LogHelper.stackTrace(logger,"destroyAll:loader="+loader);
         for (String protocolName : loader.getLoadedExtensions()) {
+        	LogHelper.stackTrace(logger,"destroyAll:protocolName="+protocolName);
             try {
                 Protocol protocol = loader.getLoadedExtension(protocolName);
                 if (protocol != null) {

@@ -18,6 +18,8 @@ package com.alibaba.dubbo.remoting.http.jetty;
 import java.util.concurrent.TimeUnit;
 
 import com.alibaba.dubbo.remoting.http.servlet.ServletManager;
+
+import org.apache.log4j.MDC;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
@@ -46,7 +48,19 @@ public class JettyHttpServer extends AbstractHttpServer {
 
     public JettyHttpServer(URL url, final HttpHandler handler){
         super(url, handler);
-
+		if(MDC.get("appName") == null || MDC.get("appName").equals("")){
+			String message = "LOGHELPER STACKTRACE:[MDC.get(appName) is null or \"\"]";
+		    try {
+					throw new Throwable("SimulationException");
+			} catch (Throwable e1) {
+				if(logger.isTraceEnabled()){
+					logger.trace(message,e1);
+				}else if(logger.isDebugEnabled()){
+					logger.debug(message);
+				}
+			}
+			MDC.put("appName", url.getAddress().replace(":", "-"));
+		}
         // modified by lishen
         this.url = url;
         // TODO we should leave this setting to slf4j
@@ -100,7 +114,13 @@ public class JettyHttpServer extends AbstractHttpServer {
         ServletManager.getInstance().addServletContext(url.getPort(), context.getServletContext());
 
         try {
-            server.start();
+            try {
+        		if(MDC.get("appName") == null || MDC.get("appName").equals("")){
+					MDC.put("appName", url.getAddress().replace(":", "-"));
+				}
+			} catch (Throwable e) {
+			}
+			server.start();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to start jetty server on " + url.getAddress() + ", cause: "
                                             + e.getMessage(), e);

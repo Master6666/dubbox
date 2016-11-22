@@ -33,6 +33,7 @@ import com.alibaba.dubbo.common.store.DataStore;
 import com.alibaba.dubbo.common.threadpool.ThreadPool;
 import com.alibaba.dubbo.common.threadpool.support.cached.CachedThreadPool;
 import com.alibaba.dubbo.common.utils.ExecutorUtil;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.common.utils.NetUtils;
 import com.alibaba.dubbo.remoting.Channel;
 import com.alibaba.dubbo.remoting.ChannelHandler;
@@ -82,6 +83,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
 
         executor = (ExecutorService) ExtensionLoader.getExtensionLoader(DataStore.class)
                 .getDefaultExtension().get(Constants.EXECUTOR_SERVICE_COMPONENT_KEY, Integer.toString(url.getPort()));
+        LogHelper.stackTrace(logger,"executor="+executor);
     }
     
     protected abstract void doOpen() throws Throwable;
@@ -183,6 +185,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
     }
     
     public void close(int timeout) {
+        LogHelper.stackTrace(logger,"close(" + timeout +") begin..." );
         ExecutorUtil.gracefulShutdown(executor ,timeout);
         close();
     }
@@ -205,6 +208,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
 
     @Override
     public void connected(Channel ch) throws RemotingException {
+        LogHelper.stackTrace(logger,"connected(" + ch +") begin..." );
         Collection<Channel> channels = getChannels();
         if (accepts > 0 && channels.size() > accepts) {
             logger.error("Close channel " + ch + ", cause: The server " + ch.getLocalAddress() + " connections greater than max config " + accepts);
@@ -216,6 +220,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
     
     @Override
     public void disconnected(Channel ch) throws RemotingException {
+        LogHelper.stackTrace(logger,"disconnected(" + ch +") begin..." );
         Collection<Channel> channels = getChannels();
         if (channels.size() == 0){
             logger.warn("All clients has discontected from " + ch.getLocalAddress() + ". You can graceful shutdown now.");

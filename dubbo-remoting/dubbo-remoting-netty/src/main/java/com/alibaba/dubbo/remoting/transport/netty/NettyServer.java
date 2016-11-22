@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.MDC;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -65,6 +66,9 @@ public class NettyServer extends AbstractServer implements Server {
 
     @Override
     protected void doOpen() throws Throwable {
+		if(MDC.get("appName") == null || MDC.get("appName").equals("")){
+			MDC.put("appName", getBindAddress().getAddress().getHostName() + "-" +getBindAddress().getPort());
+		}
         NettyHelper.setNettyLoggerFactory();
         ExecutorService boss = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerBoss", true));
         ExecutorService worker = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerWorker", true));
@@ -90,6 +94,12 @@ public class NettyServer extends AbstractServer implements Server {
                 return pipeline;
             }
         });
+        try {
+    		if(MDC.get("appName") == null || MDC.get("appName").equals("")){
+				MDC.put("appName", getBindAddress().getAddress().getHostName() + "-" +getBindAddress().getPort());
+			}
+		} catch (Throwable e) {
+		}
         // bind
         channel = bootstrap.bind(getBindAddress());
     }
