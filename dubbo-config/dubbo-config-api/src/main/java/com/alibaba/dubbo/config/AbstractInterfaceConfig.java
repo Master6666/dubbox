@@ -25,6 +25,7 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.Version;
 import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import com.alibaba.dubbo.common.utils.ConfigUtils;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.common.utils.NetUtils;
 import com.alibaba.dubbo.common.utils.ReflectUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
@@ -105,6 +106,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         // 兼容旧版本
         if (registries == null || registries.size() == 0) {
             String address = ConfigUtils.getProperty("dubbo.registry.address");
+            LogHelper.stackTrace("checkRegistry:address="+address);
             if (address != null && address.length() > 0) {
                 registries = new ArrayList<RegistryConfig>();
                 String[] as = address.split("\\s*[|]+\\s*");
@@ -161,13 +163,16 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         if (registries != null && registries.size() > 0) {
             for (RegistryConfig config : registries) {
                 String address = config.getAddress();
-                if (address == null || address.length() == 0) {
+            	LogHelper.stackTrace("loadRegistries:address="+address);
+            	if (address == null || address.length() == 0) {
                 	address = Constants.ANYHOST_VALUE;
                 }
                 String sysaddress = System.getProperty("dubbo.registry.address");
+            	LogHelper.stackTrace("loadRegistries:sysaddress="+sysaddress);
                 if (sysaddress != null && sysaddress.length() > 0) {
                     address = sysaddress;
                 }
+            	LogHelper.stackTrace("loadRegistries:address="+address);
                 if (address != null && address.length() > 0 
                         && ! RegistryConfig.NO_AVAILABLE.equalsIgnoreCase(address)) {
                     Map<String, String> map = new HashMap<String, String>();
@@ -179,6 +184,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                     if (ConfigUtils.getPid() > 0) {
                         map.put(Constants.PID_KEY, String.valueOf(ConfigUtils.getPid()));
                     }
+                	LogHelper.stackTrace("loadRegistries:map.containsKey(protocol)="+map.containsKey("protocol"));
                     if (! map.containsKey("protocol")) {
                         if (ExtensionLoader.getExtensionLoader(RegistryFactory.class).hasExtension("remote")) {
                             map.put("protocol", "remote");
@@ -187,12 +193,14 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                         }
                     }
                     List<URL> urls = UrlUtils.parseURLs(address, map);
+                	LogHelper.stackTrace("loadRegistries:urls="+urls);
                     for (URL url : urls) {
                         url = url.addParameter(Constants.REGISTRY_KEY, url.getProtocol());
                         url = url.setProtocol(Constants.REGISTRY_PROTOCOL);
                         if ((provider && url.getParameter(Constants.REGISTER_KEY, true))
                                 || (! provider && url.getParameter(Constants.SUBSCRIBE_KEY, true))) {
                             registryList.add(url);
+                        	LogHelper.stackTrace("loadRegistries:add("+url+")");
                         }
                     }
                 }
@@ -453,6 +461,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
 
     @SuppressWarnings({ "unchecked" })
     public void setRegistries(List<? extends RegistryConfig> registries) {
+    	LogHelper.stackTrace("setRegistries("+registries+") begin...");
         this.registries = (List<RegistryConfig>)registries;
     }
 

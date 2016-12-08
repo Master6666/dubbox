@@ -36,6 +36,7 @@ import com.alibaba.dubbo.common.bytecode.Wrapper;
 import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import com.alibaba.dubbo.common.utils.ClassHelper;
 import com.alibaba.dubbo.common.utils.ConfigUtils;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.common.utils.NetUtils;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.annotation.Service;
@@ -293,10 +294,12 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         }
 
         String host = protocolConfig.getHost();
+    	LogHelper.stackTrace(logger,"doExportUrlsFor1Protocol:protocolConfig.getHost()="+protocolConfig.getHost()+",provider="+provider);
         if (provider != null && (host == null || host.length() == 0)) {
             host = provider.getHost();
         }
         boolean anyhost = false;
+    	LogHelper.stackTrace(logger,"doExportUrlsFor1Protocol:NetUtils.isInvalidLocalHost("+host+")="+NetUtils.isInvalidLocalHost(host));
         if (NetUtils.isInvalidLocalHost(host)) {
             anyhost = true;
             try {
@@ -313,6 +316,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                                 SocketAddress addr = new InetSocketAddress(registryURL.getHost(), registryURL.getPort());
                                 socket.connect(addr, 1000);
                                 host = socket.getLocalAddress().getHostAddress();
+                            	LogHelper.stackTrace(logger,"doExportUrlsFor1Protocol:host="+host+",registryURL.getPort()="+registryURL.getPort());
                                 break;
                             } finally {
                                 try {

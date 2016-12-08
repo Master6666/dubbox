@@ -378,7 +378,9 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 }
             } else { // 通过注册中心配置拼装URL
             	List<URL> us = loadRegistries(false);
+    	        LogHelper.stackTrace(logger,"loadRegistries(false)=us="+us);
             	if (us != null && us.size() > 0) {
+        	        LogHelper.stackTrace(logger,"loadRegistries(false)=us,us.size="+us.size());
                 	for (URL u : us) {
                 	    URL monitorUrl = loadMonitor(u);
             	        LogHelper.stackTrace(logger,"monitorUrl="+monitorUrl);
@@ -407,6 +409,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                         registryURL = url; // 用了最后一个registry url
                     }
                 }
+            	LogHelper.stackTrace("createProxy:registryURL="+registryURL);
                 if (registryURL != null) { // 有 注册中心协议的URL
                     // 对有注册中心的Cluster 只用 AvailableCluster
                     URL u = registryURL.addParameter(Constants.CLUSTER_KEY, AvailableCluster.NAME); 
