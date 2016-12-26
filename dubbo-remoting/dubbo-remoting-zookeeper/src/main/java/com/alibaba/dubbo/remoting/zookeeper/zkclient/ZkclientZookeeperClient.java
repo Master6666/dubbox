@@ -11,22 +11,46 @@ import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 
 import com.alibaba.dubbo.common.URL;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.remoting.zookeeper.ChildListener;
 import com.alibaba.dubbo.remoting.zookeeper.StateListener;
 import com.alibaba.dubbo.remoting.zookeeper.support.AbstractZookeeperClient;
 
 public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildListener> {
 
-	private final ZkClient client;
-
+//	private final ZkClient client;
+	private ZkClient client;
+	private final Object clientLock = new Object();
+	private final URL url;
 	private volatile KeeperState state = KeeperState.SyncConnected;
 
 	public ZkclientZookeeperClient(URL url) {
 		super(url);
-		client = new ZkClient(
-                url.getBackupAddress(),
-                url.getParameter(Constants.SESSION_TIMEOUT_KEY, Constants.DEFAULT_SESSION_TIMEOUT),
-                url.getParameter(Constants.TIMEOUT_KEY, Constants.DEFAULT_REGISTRY_CONNECT_TIMEOUT));
+		this.url=url;
+		boolean check=url.getParameter(Constants.CHECK_KEY,"true").equalsIgnoreCase("true");
+		LogHelper.stackTrace(logger,"url.getParameter("+Constants.CHECK_KEY+",true)="+check+"("+url.toFullString()+")");
+		try {
+			client = null;
+			createZkClient();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			LogHelper.stackTrace(logger,"createZkClient Throwable.("+url.toFullString()+")",e);
+			if(check){
+				throw new RuntimeException(e);	
+			}
+		}
+	}
+
+	private void createZkClient(){
+		synchronized (clientLock) {
+			if(client!=null){
+				return;
+			}
+			client = new ZkClient(url.getBackupAddress(), url.getParameter(
+					Constants.SESSION_TIMEOUT_KEY,
+					Constants.DEFAULT_SESSION_TIMEOUT), url.getParameter(
+					Constants.TIMEOUT_KEY,
+					Constants.DEFAULT_REGISTRY_CONNECT_TIMEOUT));
 		client.subscribeStateChanges(new IZkStateListener() {
 			public void handleStateChanged(KeeperState state) throws Exception {
 				ZkclientZookeeperClient.this.state = state;
@@ -40,32 +64,46 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
 				stateChanged(StateListener.RECONNECTED);
 			}
 		});
+		}		
 	}
 
+	
 	public void createPersistent(String path) {
 		try {
-			client.createPersistent(path, true);
+			synchronized (clientLock) {
+				createZkClient();
+				client.createPersistent(path, true);
+			}
 		} catch (ZkNodeExistsException e) {
 		}
 	}
 
 	public void createEphemeral(String path) {
 		try {
-			client.createEphemeral(path);
+			synchronized (clientLock) {
+				createZkClient();
+				client.createEphemeral(path);
+			}
 		} catch (ZkNodeExistsException e) {
 		}
 	}
 
 	public void delete(String path) {
 		try {
-			client.delete(path);
+			synchronized (clientLock) {
+				createZkClient();
+				client.delete(path);
+			}
 		} catch (ZkNoNodeException e) {
 		}
 	}
 
 	public List<String> getChildren(String path) {
 		try {
-			return client.getChildren(path);
+			synchronized (clientLock) {
+				createZkClient();
+				return client.getChildren(path);
+			}
         } catch (ZkNoNodeException e) {
             return null;
         }
@@ -76,24 +114,35 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
 	}
 
 	public void doClose() {
-		client.close();
+		synchronized (clientLock) {
+			createZkClient();
+			client.close();
+		}
 	}
 
 	public IZkChildListener createTargetChildListener(String path, final ChildListener listener) {
-		return new IZkChildListener() {
-			public void handleChildChange(String parentPath, List<String> currentChilds)
-					throws Exception {
-				listener.childChanged(parentPath, currentChilds);
-			}
-		};
+		synchronized (clientLock) {
+			createZkClient();
+			return new IZkChildListener() {
+				public void handleChildChange(String parentPath, List<String> currentChilds)
+						throws Exception {
+					listener.childChanged(parentPath, currentChilds);
+				}
+			};
+		}
 	}
 
 	public List<String> addTargetChildListener(String path, final IZkChildListener listener) {
-		return client.subscribeChildChanges(path, listener);
+		synchronized (clientLock) {
+			createZkClient();
+			return client.subscribeChildChanges(path, listener);
+		}
 	}
 
 	public void removeTargetChildListener(String path, IZkChildListener listener) {
-		client.unsubscribeChildChanges(path,  listener);
+		synchronized (clientLock) {
+			createZkClient();
+			client.unsubscribeChildChanges(path,  listener);
+		}
 	}
-
 }
