@@ -42,9 +42,11 @@
 	</filter-mapping>
  -->
 	<!-- Logger -->
+	<!-- 
 	<listener>
 		<listener-class>com.alibaba.citrus.logconfig.LogConfiguratorListener</listener-class>
 	</listener>
+	 -->
 
 	<!-- Loading /WEB-INF/webx.xml, /WEB-INF/webx-*.xml -->
 	<listener>

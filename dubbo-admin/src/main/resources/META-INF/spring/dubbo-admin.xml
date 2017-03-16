@@ -12,9 +12,9 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<list>
-				<value>/WEB-INF/dubbo.properties</value>
-				<value>file://${user.home}/dubbo.properties</value>
-				<value>file://${user.dir}/../../dubbo.properties</value>
+				<value>/WEB-INF/dubbo-admin.properties</value>
+				<value>file://${user.home}/dubbo-admin.properties</value>
+				<value>file://${user.dir}/../../dubbo-admin.properties</value>
 			</list>
 		</property>
 	</bean>
