@@ -18,6 +18,7 @@ package com.alibaba.dubbo.config;
 import java.util.Map;
 
 import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.config.support.Parameter;
 import com.alibaba.dubbo.registry.support.AbstractRegistryFactory;
 
@@ -125,10 +126,12 @@ public class RegistryConfig extends AbstractConfig {
     }
 
     public String getUsername() {
+      	LogHelper.stackTrace(logger,"getUsername() begin...username="+username);
         return username;
     }
 
     public void setUsername(String username) {
+     	LogHelper.stackTrace(logger,"setUsername("+username+") begin...");
         checkName("username", username);
         this.username = username;
     }
@@ -287,10 +290,12 @@ public class RegistryConfig extends AbstractConfig {
 	}
 
     public String getGroup() {
-        return group;
+     	LogHelper.stackTrace(logger,"getGroup() begin...group="+group);
+       return group;
     }
 
     public void setGroup(String group) {
+     	LogHelper.stackTrace(logger,"setGroup("+group+") begin...");
         this.group = group;
     }
 

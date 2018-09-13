@@ -28,7 +28,6 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
 		super(url);
 		this.url=url;
 		boolean check=url.getParameter(Constants.CHECK_KEY,"true").equalsIgnoreCase("true");
-		LogHelper.stackTrace(logger,"url.getParameter("+Constants.CHECK_KEY+",true)="+check+"("+url.toFullString()+")");
 		try {
 			client = null;
 			createZkClient();
@@ -51,7 +50,17 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
 					Constants.DEFAULT_SESSION_TIMEOUT), url.getParameter(
 					Constants.TIMEOUT_KEY,
 					Constants.DEFAULT_REGISTRY_CONNECT_TIMEOUT));
-		client.subscribeStateChanges(new IZkStateListener() {
+
+			LogHelper.stackTrace(logger,"url.getParameter(username)="+url.getParameter("username")+"("+url.toFullString()+")");
+			//zookeeper://yhjtest2:WdYRScFdDUw0zwjJa+ZC5/oQViU=@172.16.28.123:2181/com.alibaba.dubbo.registry.RegistryService?application=tisson-fingerprint-service&check=true&dubbo=2.8.4-dd-orange-eagle&group=yhjtest2&interface=com.alibaba.dubbo.registry.RegistryService&organization=tisson&owner=admin&pid=2245&timestamp=1536829455008)], dubbo version: 2.8.4-dd-orange-eagle, current host: 127.0.0.1
+			String locaUserFromPrefix = "zookeeper://";
+			String digest="dzdb:!Q2w3E$r5";
+			if(url.toFullString().startsWith(locaUserFromPrefix) && url.toFullString().indexOf("@")> locaUserFromPrefix.length()+1  && url.toFullString().indexOf(":", locaUserFromPrefix.length()+1) >0 && url.toFullString().indexOf(":", locaUserFromPrefix.length()+1) <url.toFullString().indexOf("@")){
+				digest=url.toFullString().substring(locaUserFromPrefix.length(),url.toFullString().indexOf("@"));
+			}
+			LogHelper.stackTrace(logger,"digest="+digest);
+			client.addAuthInfo("digest",digest.getBytes());
+			client.subscribeStateChanges(new IZkStateListener() {
 			public void handleStateChanged(KeeperState state) throws Exception {
 				ZkclientZookeeperClient.this.state = state;
 				if (state == KeeperState.Disconnected) {
@@ -63,6 +72,10 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
 			public void handleNewSession() throws Exception {
 				stateChanged(StateListener.RECONNECTED);
 			}
+			@Override
+			public void handleSessionEstablishmentError(Throwable arg0)
+					throws Exception {
+			}
 		});
 		}		
 	}
@@ -72,6 +85,7 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
 		try {
 			synchronized (clientLock) {
 				createZkClient();
+				LogHelper.stackTrace(logger,"client.createPersistent("+path+") begin...");
 				client.createPersistent(path, true);
 			}
 		} catch (ZkNodeExistsException e) {
@@ -82,6 +96,7 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
 		try {
 			synchronized (clientLock) {
 				createZkClient();
+				LogHelper.stackTrace(logger,"client.createEphemeral("+path+") begin...");
 				client.createEphemeral(path);
 			}
 		} catch (ZkNodeExistsException e) {

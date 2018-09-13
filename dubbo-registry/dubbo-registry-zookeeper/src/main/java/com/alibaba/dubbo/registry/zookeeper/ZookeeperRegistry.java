@@ -26,6 +26,7 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
+import com.alibaba.dubbo.common.utils.LogHelper;
 import com.alibaba.dubbo.common.utils.UrlUtils;
 import com.alibaba.dubbo.registry.NotifyListener;
 import com.alibaba.dubbo.registry.support.FailbackRegistry;
@@ -67,6 +68,11 @@ public class ZookeeperRegistry extends FailbackRegistry {
         }
         this.root = group;
         zkClient = zookeeperTransporter.connect(url);
+
+        if(logger.isDebugEnabled()){
+        	logger.debug("zookeeperTransporter.connect("+url+") return "+ zkClient);
+        }
+               
         zkClient.addStateListener(new StateListener() {
             public void stateChanged(int state) {
             	if (state == RECONNECTED) {
@@ -97,7 +103,7 @@ public class ZookeeperRegistry extends FailbackRegistry {
         try {
         	zkClient.create(toUrlPath(url), url.getParameter(Constants.DYNAMIC_KEY, true));
         } catch (Throwable e) {
-            throw new RpcException("Failed to register " + url + " to zookeeper " + getUrl() + ", cause: " + e.getMessage(), e);
+            throw new RpcException("Failed to register " + url + " to zookeeper " + getUrl() + ", toUrlPath(url)="+toUrlPath(url)+",url.getParameter("+Constants.DYNAMIC_KEY+",true)="+url.getParameter(Constants.DYNAMIC_KEY, true)+"cause: " + e.getMessage(), e);
         }
     }
 
@@ -241,7 +247,9 @@ public class ZookeeperRegistry extends FailbackRegistry {
     }
 
     private String toUrlPath(URL url) {
-        return toCategoryPath(url) + Constants.PATH_SEPARATOR + URL.encode(url.toFullString());
+        String urlpath = toCategoryPath(url) + Constants.PATH_SEPARATOR + URL.encode(url.toFullString());
+		LogHelper.stackTrace(logger,"toUrlPath("+url+") return " + urlpath);
+		return urlpath;
     }
     
     private List<URL> toUrlsWithoutEmpty(URL consumer, List<String> providers) {
